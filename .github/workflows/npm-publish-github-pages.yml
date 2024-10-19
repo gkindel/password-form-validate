@@ -1,20 +1,21 @@
 name: GH Pages Deploy
-
 on:
   push:
     branches:
       - main
-
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm run build
-
+      - run: npm ci
+      - run: npm build
   deploy:
     name: GH Pages Deploy
     needs: build
@@ -24,11 +25,12 @@ jobs:
       contents: read
       packages: write
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
+      - name: Setup Node
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          registry-url: https://npm.pkg.github.com/
       - run: npm run deploy
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
