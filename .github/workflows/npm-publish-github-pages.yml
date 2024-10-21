@@ -22,7 +22,9 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-    permissions: write-all
+    permissions:
+      contents: write
+      pages: write
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
