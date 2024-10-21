@@ -22,9 +22,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-    permissions:
-      contents: read
-      pages: write
+    permissions: write-all
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -36,6 +34,7 @@ jobs:
         run: npm ci
       - name: Deploy with gh-pages
         run: npm run predeploy
+      - run: echo git remote set-url origin https://git:zzz@github.com/${GITHUB_REPOSITORY}.git
       - name: Deploy to gh-pages
         run: |
           git remote set-url origin https://git:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
