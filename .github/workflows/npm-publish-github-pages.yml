@@ -13,8 +13,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm ci
-      - run: npm run build
+      - name: Installing node modules
+        run: npm ci
+      - name: Building
+        run: npm run build
   deploy:
     name: GH Pages Deploy
     needs: build
@@ -30,9 +32,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm ci
-      - run: echo git remote set-url origin https://git:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
+      - name: Installing node modules
+        run: npm ci
       - name: Deploy with gh-pages
+      - name: Building
+        run: npm run predeploy
+      - name: Deploy to gh-pages
         run: |
           git remote set-url origin https://git:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
           npx gh-pages -d dist -u "github-actions-bot <support+actions@github.com>"
