@@ -35,7 +35,6 @@ jobs:
       - name: Installing node modules
         run: npm ci
       - name: Deploy with gh-pages
-      - name: Building
         run: npm run predeploy
       - name: Deploy to gh-pages
         run: |
