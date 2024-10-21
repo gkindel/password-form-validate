@@ -24,7 +24,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     permissions:
       contents: read
-      packages: write
+      pages: write
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
