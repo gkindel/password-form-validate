@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { Register } from './validators/useFormValidator.ts';
-import { validate } from './validators/validators/PasswordValidation.ts';
+import { Register, ValidationError } from './validators/useFormValidator.ts';
+import { validateMatch, validatePassword } from './validators/validators/PasswordValidation.ts';
 
 /*
     Using React, write a password entry library that meets the following requirements:
@@ -21,9 +21,11 @@ export interface PasswordInputProps {
   register?: Register;
 }
 
-const StyledLabel = styled.label`
+const StyledLabel = styled.label<{ $hasError?: boolean }>`
   display: flex;
   padding: 0.5em;
+  color: ${(props) => (props.$hasError ? 'red' : 'inherit')};
+
   span {
     width: 10rem;
     text-align: right;
@@ -31,8 +33,15 @@ const StyledLabel = styled.label`
   }
   input {
     flex-grow: 1;
-    border-color: #888888;
+    border-style: solid;
   }
+  input:focus {
+    border-color: inherit;
+  }
+`;
+
+const StyledErrors = styled.div`
+  color: red;
 `;
 
 export const PasswordInput: React.FC<PasswordInputProps> = ({
@@ -43,9 +52,21 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
 }) => {
   const [primary, setPrimary] = useState('');
   const [secondary, setSecondary] = useState('');
+  const [passwordErrors, setPasswordErrors] = useState<ValidationError[]>([]);
+  const [confirmErrors, setConfirmErrors] = useState<ValidationError[]>([]);
+
+  const validationCallback = useCallback(() => {
+    const passwordErrors = validatePassword(primary);
+    setPasswordErrors(passwordErrors);
+    const confirmErrors = validateMatch(primary, secondary);
+    setConfirmErrors(confirmErrors);
+    return [...passwordErrors, ...confirmErrors];
+  }, [primary, secondary]);
 
   // register our validator
-  useEffect(() => register && register(name, () => validate(primary, secondary)), [name, primary, register, secondary]);
+  useEffect(() => {
+    if (register) register(name, validationCallback);
+  }, [name, validationCallback]);
 
   const _handlePrimaryChange = useCallback(
     (e: React.ChangeEvent): void => {
@@ -63,7 +84,16 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
 
   return (
     <>
-      <StyledLabel>
+      <StyledErrors role={'alert'} aria-live="assertive">
+        {passwordErrors.map((e: ValidationError) => (
+          <div key={e.type}>{e.message}</div>
+        ))}
+        {confirmErrors.map((e: ValidationError) => (
+          <div key={e.type}>{e.message}</div>
+        ))}
+      </StyledErrors>
+
+      <StyledLabel $hasError={passwordErrors.length > 0}>
         <span>{passwordText}</span>
         <input
           type={'password'}
@@ -73,7 +103,8 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
           onChange={_handlePrimaryChange}
         />
       </StyledLabel>
-      <StyledLabel>
+
+      <StyledLabel $hasError={confirmErrors.length > 0}>
         <span>{confirmText}</span>
         <input type={'password'} data-testid={'confirm_password'} value={secondary} onChange={_handleSecondaryChange} />
       </StyledLabel>
