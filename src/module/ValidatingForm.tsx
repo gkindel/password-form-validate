@@ -1,7 +1,7 @@
-import { PasswordInput } from './module/PasswordInput.tsx';
+import { PasswordInput } from './PasswordInput.tsx';
 import React, { useCallback, useState } from 'react';
+import { useFormValidator, ValidationError } from './validators/useFormValidator.ts';
 import styled from 'styled-components';
-import { useFormValidator, ValidationError } from './module/validators/useFormValidator.ts';
 
 const StyledForm = styled.form`
   text-align: left;
@@ -36,7 +36,15 @@ const StyledSuccess = styled.div`
   color: green;
 `;
 
-function PasswordForm() {
+/*
+    todo:
+     - add onsubmit prop?
+     - highlight form element that errored
+     - link error messages to form element
+
+ */
+
+function ValidatingForm() {
   const [errors, setErrors] = useState<ValidationError[]>([]);
   const [success, setSuccess] = useState(false);
 
@@ -55,13 +63,16 @@ function PasswordForm() {
   return (
     <div>
       <h3>{'<PasswordInput>'} component w/ validation</h3>
+
       <StyledForm onSubmit={_handleSubmit}>
         {success && <StyledSuccess>Successfully validated!</StyledSuccess>}
-        <StyledErrors>
+
+        <StyledErrors role={'alert'} aria-live="assertive">
           {errors.map((e: ValidationError, i) => (
             <div key={i}>{e.message}</div>
           ))}
         </StyledErrors>
+
         <PasswordInput name={'mypassword'} register={register} />
 
         <StyledFormActions>
@@ -72,4 +83,4 @@ function PasswordForm() {
   );
 }
 
-export default PasswordForm;
+export default ValidatingForm;

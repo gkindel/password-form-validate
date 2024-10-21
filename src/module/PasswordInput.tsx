@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { validate } from './validators/PasswordValidation.ts';
 import styled from 'styled-components';
 import { Register } from './validators/useFormValidator.ts';
+import { validate } from './validators/validators/PasswordValidation.ts';
 
 /*
     Using React, write a password entry library that meets the following requirements:
